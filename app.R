@@ -19,7 +19,8 @@ lookup_table <- read.csv("https://raw.githubusercontent.com/pointblue/BioStimula
 
 firetype_table <- read.csv("https://raw.githubusercontent.com/pointblue/BioStimulantWebTool/main/Data/firetype.csv")
 
-
+# Ensure the column names are consistent
+colnames(firetype_table) <- c("Location", "FireType")
 pdf_example<-"https://github.com/pointblue/BioStimulantWebTool/blob/main/www/soil.pdf?raw=true"
 
 
@@ -78,6 +79,7 @@ ui <- fluidPage(
     div(class = "map-container", leafletOutput("map")),
     uiOutput("dropdown"),
     uiOutput("firetype_dropdown"),
+    uiOutput("slider_ui"),
     uiOutput("downloadButton")
   )
 )
@@ -122,7 +124,7 @@ server <- function(input, output, session) {
       pull(Choice)  
     
     if (length(choices) > 0) { 
-      selectInput("location", "Select Location:", choices = c("", choices))
+      selectInput("location", "Select region within county:", choices = c("", choices))
     } else {
       NULL 
     }
@@ -143,6 +145,17 @@ server <- function(input, output, session) {
       NULL 
     }
   })
+  
+  
+  # Render the slider dynamically
+  output$slider_ui <- renderUI({
+    req(input$firetype)  # Ensure that a fire type has been selected
+    
+    sliderInput(inputId = "slider", label = "Years since fire", value = 5, min = 1, max = 100)
+  })
+    
+    
+
   
   
   

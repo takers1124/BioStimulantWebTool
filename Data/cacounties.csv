@@ -10,11 +10,14 @@ Colusa County,Sacramento Valley
 Contra Costa County,East Bay
 Del Norte County,North Coast
 El Dorado County,Sierra Nevada
+Fresno County,Sierra Nevada
+Fresno County,Foothills
 Fresno County,Central Valley
 Glenn County,Sacramento Valley
 Humboldt County,North Coast
 Imperial County,Desert
 Inyo County,Eastern Sierra
+Kern County,Foothills
 Kern County,Central Valley
 Kings County,Central Valley
 Lake County,North Coast
@@ -26,16 +29,19 @@ Madera County,Central Valley
 Marin County,Coastal
 Marin County,Interior
 Mariposa County,Sierra Nevada
+Mendocino County,Interior
 Mendocino County,North Coast
 Merced County,Central Valley
 Modoc County,Northeast
 Mono County,Eastern Sierra
+Monterey County,Interior
 Monterey County,Central Coast
 Napa County,Wine Country
 Nevada County,Sierra Nevada
 Orange County,South Coast
 Placer County,Sierra Nevada
 Plumas County,Northeast
+Riverside County,Mojave desert
 Riverside County,Inland Empire
 Sacramento County,Sacramento Valley
 San Benito County,Central Coast
@@ -45,8 +51,10 @@ San Diego County,Central
 San Diego County,South Bay
 San Francisco County,The City
 San Joaquin County,Central Valley
+San Luis Obispo County,Interior
 San Luis Obispo County,Central Coast
 San Mateo County,Bay Area
+Santa Barbara County,Interior
 Santa Barbara County,Central Coast
 Santa Clara County,Silicon Valley
 Santa Cruz County,Central Coast
@@ -54,13 +62,16 @@ Shasta County,North State
 Sierra County,Sierra Nevada
 Siskiyou County,North State
 Solano County,North Bay
+Sonoma County,Coastal
 Sonoma County,Wine Country
 Stanislaus County,Central Valley
 Sutter County,Sacramento Valley
 Tehama County,North State
 Trinity County,North State
 Tulare County,Central Valley
+Tuolumne County,Eastern Sierra
 Tuolumne County,Sierra Nevada
+Ventura County,Interior
 Ventura County,South Coast
 Yolo County,Sacramento Valley
 Yuba County,Sacramento Valley
