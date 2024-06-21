@@ -20,7 +20,7 @@ lookup_table <- read.csv("https://raw.githubusercontent.com/pointblue/BioStimula
 firetype_table <- read.csv("https://raw.githubusercontent.com/pointblue/BioStimulantWebTool/main/Data/firetype.csv")
 
 # Ensure the column names are consistent
-colnames(firetype_table) <- c("Location", "FireType")
+colnames(firetype_table) <- c("Location", "FireType", "RecommendationFireType")
 pdf_example<-"https://github.com/pointblue/BioStimulantWebTool/blob/main/www/soil.pdf?raw=true"
 
 
@@ -62,6 +62,8 @@ ui <- fluidPage(
         margin: 20px 0;
         font-weight: bold; /* Make the text bold */
       }
+      
+      
     "))
   ),
   div(
@@ -79,6 +81,7 @@ ui <- fluidPage(
     div(class = "map-container", leafletOutput("map")),
     uiOutput("dropdown"),
     uiOutput("firetype_dropdown"),
+    textOutput("recommendation_text"),
     uiOutput("slider_ui"),
     uiOutput("downloadButton")
   )
@@ -130,7 +133,6 @@ server <- function(input, output, session) {
     }
   })
   
-  
   # Render Fire Type dropdown menu dynamically
   output$firetype_dropdown <- renderUI({
     req(input$location)
@@ -143,6 +145,36 @@ server <- function(input, output, session) {
       selectInput("firetype", "Select Fire Type:", choices = c("", choices))
     } else {
       NULL 
+    }
+  })
+  
+  
+  # Render the recommendation text dynamically
+  output$recommendation_text_ui <- renderUI({
+    req(input$firetype)
+    
+    recommendation <- firetype_table %>%
+      filter(Location == input$location, FireType == input$firetype) %>%
+      pull(RecommendationFireType)
+    
+    if (length(recommendation) > 0) {
+      recommendation
+    } else {
+      NULL 
+    }
+  })
+  
+  output$recommendation_text <- renderText({
+    req(input$firetype)
+    
+    recommendation <- firetype_table %>%
+      filter(Location == input$location, FireType == input$firetype) %>%
+      pull(RecommendationFireType)
+    
+    if (length(recommendation) > 0) {
+      recommendation
+    } else {
+      ""
     }
   })
   
