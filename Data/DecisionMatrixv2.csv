@@ -1,0 +1,34 @@
+Questions,,,,,Recommendation Codes,,,,
+Public/Private,Prescribed/Wild,Structure/No Structure,Wood/Other,Northern/Southern,A,B,C,D,E
+Public,Prescribed,Structure,Wood,Northern,Y,Y,Y,Y,Y
+Private,Prescribed,Structure,Wood,Northern,N,Y,Y,Y,Y
+Public,Wild,Structure,Wood,Northern,Y,N,Y,Y,Y
+Private,Wild,Structure,Wood,Northern,N,N,Y,Y,Y
+Public,Prescribed,No Structure,Wood,Northern,Y,Y,N,Y,Y
+Private,Prescribed,No Structure,Wood,Northern,N,Y,N,Y,Y
+Public,Wild,No Structure,Wood,Northern,Y,N,N,Y,Y
+Private,Wild,No Structure,Wood,Northern,N,N,N,Y,Y
+Public,Prescribed,Structure,Other Ecosystem,Northern,Y,Y,Y,N,Y
+Private,Prescribed,Structure,Other Ecosystem,Northern,N,Y,Y,N,Y
+Public,Wild,Structure,Other Ecosystem,Northern,Y,N,Y,N,Y
+Private,Wild,Structure,Other Ecosystem,Northern,N,N,Y,N,Y
+Public,Prescribed,No Structure,Other Ecosystem,Northern,Y,Y,N,N,Y
+Private,Prescribed,No Structure,Other Ecosystem,Northern,N,Y,N,N,Y
+Public,Wild,No Structure,Other Ecosystem,Northern,Y,N,N,N,Y
+Private,Wild,No Structure,Other Ecosystem,Northern,N,N,N,N,Y
+Public,Prescribed,Structure,Wood,Southern,Y,Y,Y,Y,N
+Private,Prescribed,Structure,Wood,Southern,N,Y,Y,Y,N
+Public,Wild,Structure,Wood,Southern,Y,N,Y,Y,N
+Private,Wild,Structure,Wood,Southern,N,N,Y,Y,N
+Public,Prescribed,No Structure,Wood,Southern,Y,Y,N,Y,N
+Private,Prescribed,No Structure,Wood,Southern,N,Y,N,Y,N
+Public,Wild,No Structure,Wood,Southern,Y,N,N,Y,N
+Private,Wild,No Structure,Wood,Southern,N,N,N,Y,N
+Public,Prescribed,Structure,Other Ecosystem,Southern,Y,Y,Y,N,N
+Private,Prescribed,Structure,Other Ecosystem,Southern,N,Y,Y,N,N
+Public,Wild,Structure,Other Ecosystem,Southern,Y,N,Y,N,N
+Private,Wild,Structure,Other Ecosystem,Southern,N,N,Y,N,N
+Public,Prescribed,No Structure,Other Ecosystem,Southern,Y,Y,N,N,N
+Private,Prescribed,No Structure,Other Ecosystem,Southern,N,Y,N,N,N
+Public,Wild,No Structure,Other Ecosystem,Southern,Y,N,N,N,N
+Private,Wild,No Structure,Other Ecosystem,Southern,N,N,N,N,N
