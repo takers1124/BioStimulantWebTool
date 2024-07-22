@@ -1,0 +1,13 @@
+name: BioStimulantWebTool
+title: BioStimulantWebTool
+username: jongsomjit
+account: jongsomjit
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 12351606
+bundleId: 8894525
+url: https://jongsomjit.shinyapps.io/BioStimulantWebTool/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: www/OFL.txt|www/Rozha_One.zip|www/RozhaOne-Regular.ttf

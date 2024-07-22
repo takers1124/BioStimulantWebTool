@@ -1,219 +1,209 @@
 library(shiny)
-library(leaflet)
-library(sf)
-library(tidyr)
-library(tidyverse)
+library(readr)
 library(dplyr)
-library(urbnmapr)
+
+#  https://www.jdtrat.com/blog/connect-shiny-google/
+library(googlesheets4)
+
+#setwd("C:/Users/djongsomjit/OneDrive - Point Blue/BioStimulantWeb/BioStimulantWebTool")
+
+options(
+  # whenever there is one account token found, use the cached token
+  gargle_oauth_email = TRUE,
+  # specify auth tokens should be stored in a hidden directory ".secrets"
+  gargle_oauth_cache = "C:/Users/djongsomjit/OneDrive - Point Blue/BioStimulantWeb/BioStimulantWebTool/.secrets"
+)
+googledrive::drive_auth() 
+googlesheets4::gs4_auth()
+
+sheet_id <- googledrive::drive_get("testsheet")$id
 
 
-# Get California county boundaries
-counties_sf <- get_urbn_map("counties", sf = TRUE)
 
-sf::st_crs(counties_sf) <- 2163
-counties_wgs84 <- sf::st_transform(counties_sf, 4326)
-ca_counties <- counties_wgs84 %>% filter(state_name == "California")
+# Load data
+questions <- read_csv("https://raw.githubusercontent.com/pointblue/BioStimulantWebTool/main/Data/Questions.csv")
+recommendations <- read_csv("https://raw.githubusercontent.com/pointblue/BioStimulantWebTool/main/Data/Recommendations.csv")
+final_recommendations <- read_csv("https://raw.githubusercontent.com/pointblue/BioStimulantWebTool/main/Data/FinalRollup.csv")
 
-# Load lookup table from CSV (create this file with county and choices)
-lookup_table <- read.csv("https://raw.githubusercontent.com/pointblue/BioStimulantWebTool/main/Data/cacounties.csv")
-
-firetype_table <- read.csv("https://raw.githubusercontent.com/pointblue/BioStimulantWebTool/main/Data/firetype.csv")
-
-# Ensure the column names are consistent
-colnames(firetype_table) <- c("Location", "FireType", "RecommendationFireType")
-pdf_example<-"https://github.com/pointblue/BioStimulantWebTool/blob/main/www/soil.pdf?raw=true"
-
-
-#############################Part 1/3 
-#UI - contains information about the layout of the app as it appears in your web browser. fluidPage() defines a layout that will resize according to the size of the browser window. 
+###################################
+### UI code
+###################################
 ui <- fluidPage(
   tags$head(
     tags$style(HTML("
-      body {
-        background-color: #6f94e3; /* Light gray background */
-      }
+      * { font-family: 'Roboto', sans-serif; }
       
-      .title-container {
-        position: fixed;
-        width: 100%;
-        z-index: 1000;
-        background-color: white;
-        border-bottom: 1px solid #ccc;
-      }
+      body { background-color: #90AEAD; margin-bottom: 50px; }
       
-      .title-container .row {
-        margin: 0;
-      }
+      .title-container { position: fixed; width: 100%; z-index: 1000; background-image: url(https://ksqd.org/wp-content/uploads/2020/11/Screen-Shot-2020-11-04-at-6.45.59-PM.png); background-size: cover; border-bottom: 1px solid #ccc;  }
       
-      .content-container {
-        margin-top: 100px; /* Adjust this value to ensure content is below the title */
-      }
+      .title-container .row { margin: 0; }
       
-      .map-container {
-        border: 2px solid black;
-        width: 70%;
-        height: 400px;
-        margin: 0 auto; /* Center the map */
-      }
+      .title-container h2 { color: #E64833; font-weight: bold; }
       
-      .info-text {
-        text-align: center;
-        font-size: 18px;
-        margin: 20px 0;
-        font-weight: bold; /* Make the text bold */
-      }
+      .questions-container h4 { font-weight: bold; }
       
+      .recommendation-text { color: #244855; font-size: 18px; font-weight: bold; margin-top: 10px; }
       
+      .questions-container { margin-top: 25px; }
+      
+      .additional-recommendations-btn { margin-top: 20px; background-color: #244855; color: white; }
+      
+      .final-recommendation { color: #141619; font-size: 18px; font-weight: bold; margin-top: 10px; }
+      
+      .intro-text { color: #141619; font-size: 20px; font-weight: 500; margin-top: 130px; text-align: center; padding: 20px; background-color: #90AEAD; }
     "))
   ),
+  
+  #########################
   div(
     class = "title-container",
-    titlePanel(div(
+    titlePanel(
       fluidRow(
-        column(width = 6, tags$img(src = "https://github.com/pointblue/BioStimulantWebTool/blob/main/www/CoRenewal-Header-Logo-less-text.jpg?raw=true", height = "50px")),
-        column(width = 6, h2("BioStimulant Exploration Tool", style = "margin-top: 10px;"))
+        column(width = 6, tags$img(src = "https://github.com/pointblue/BioStimulantWebTool/blob/main/www/CoRenewal-Header-Logo-less-text.jpg?raw=true", height = "110px")),
+        column(width = 6, h2("BioStimulant Exploration Tool", style = "margin-top: 10px; font-size: 40px;"))
       )
-    ), windowTitle = "MyPage")
+    )
   ),
+  
+  #########################
+  div(class = "intro-text", "Welcome to the biostimulant web tool. Please select from the following options below to see general recommendations based on your fire. Once all selections are made, click on 'Additional Recommendations' to see biostimulant general guidelines based on all your choices as a whole. Hit the 'Refresh' button to start over."),
+  
+  #########################
   div(
-    class = "content-container",
-    div(class = "info-text", "Choose your county of interest"),
-    div(class = "map-container", leafletOutput("map")),
-    uiOutput("dropdown"),
-    uiOutput("firetype_dropdown"),
-    textOutput("recommendation_text"),
-    uiOutput("slider_ui"),
-    uiOutput("downloadButton")
+    class = "questions-container",
+    actionButton("refreshButton", "Refresh"),
+    uiOutput("questionsUI"),
+    uiOutput("buttonUI"),
+    div(class = "final-recommendation", textOutput("finalRecommendation"))
   )
 )
 
-
-#############################Part 2/3 
-# Server - contains information about the computation of the app, creating plots, tables, maps etc. using information provided by the user. 
+###################################
+## Server code
+###################################
 server <- function(input, output, session) {
+  # Initialize reactive values to store user responses
+  user_responses <- reactiveValues(data = list())
   
-  # Reactive value to store clicked county
-  clicked_county <- reactiveVal(NULL)
-  
-  # Render map
-  output$map <- renderLeaflet({
-    leaflet(ca_counties) %>%
-      addTiles() %>%
-      addPolygons(
-        fillColor = ~ifelse(county_name == clicked_county(), "red", "lightblue"),
-        weight = 1, 
-        color = "black",
-        highlightOptions = highlightOptions(weight = 3, color = "red"),
-        label = ~county_name,
-        layerId = ~county_name, 
-        popup = ~county_name
-      ) %>%
-      setView(lng = -119.5, lat = 37.5, zoom = 5.5)
+  #########################
+  output$questionsUI <- renderUI({
+    lapply(1:nrow(questions), function(i) {
+      question_code <- questions$QuestionCode[i]
+      question_title <- questions$QuestionTitle[i]
+      options <- c("", questions$Option1[i], questions$Option2[i])
+      
+      div(
+        h4(question_title),
+        selectInput(paste0("question_", question_code), label = NULL, choices = options),
+        div(class = "recommendation-text", textOutput(paste0("recommendation_", question_code)))
+      )
+    })
   })
   
-  
-  # Observe map clicks
-  observeEvent(input$map_shape_click, {
-    clicked_county(input$map_shape_click$id)
-  })
-  
-  
-  # Render dropdown menu dynamically
-  output$dropdown <- renderUI({
-    req(clicked_county())
+  #########################
+  # Create additional recommendations button
+  output$buttonUI <- renderUI({
+    req(questions)
     
-    choices <- lookup_table %>%
-      filter(County == clicked_county()) %>%
-      pull(Choice)  
-    
-    if (length(choices) > 0) { 
-      selectInput("location", "Select region within county:", choices = c("", choices))
-    } else {
-      NULL 
+    if (all(sapply(questions$QuestionCode, function(q) input[[paste0("question_", q)]] != ""))) {
+      actionButton("showRecommendations", "Additional Recommendations", class = "additional-recommendations-btn")
     }
   })
   
-  # Render Fire Type dropdown menu dynamically
-  output$firetype_dropdown <- renderUI({
-    req(input$location)
+  #########################
+  # Action for "Additional recommendations" button click
+  observeEvent(input$showRecommendations, {
+    req(questions, input$showRecommendations)
     
-    choices <- firetype_table %>%
-      filter(Location == input$location) %>%
-      pull(FireType)
-    
-    if (length(choices) > 0) { 
-      selectInput("firetype", "Select Fire Type:", choices = c("", choices))
-    } else {
-      NULL 
-    }
-  })
-  
-  
-  # Render the recommendation text dynamically
-  output$recommendation_text_ui <- renderUI({
-    req(input$firetype)
-    
-    recommendation <- firetype_table %>%
-      filter(Location == input$location, FireType == input$firetype) %>%
-      pull(RecommendationFireType)
-    
-    if (length(recommendation) > 0) {
-      recommendation
-    } else {
-      NULL 
-    }
-  })
-  
-  output$recommendation_text <- renderText({
-    req(input$firetype)
-    
-    recommendation <- firetype_table %>%
-      filter(Location == input$location, FireType == input$firetype) %>%
-      pull(RecommendationFireType)
-    
-    if (length(recommendation) > 0) {
-      recommendation
-    } else {
-      ""
-    }
-  })
-  
-  
-  # Render the slider dynamically
-  output$slider_ui <- renderUI({
-    req(input$firetype)  # Ensure that a fire type has been selected
-    
-    sliderInput(inputId = "slider", label = "Years since fire", value = 5, min = 1, max = 100)
-  })
-    
-    
+    if (input$showRecommendations > 0) {
+      selected_options <- sapply(questions$QuestionCode, function(q) input[[paste0("question_", q)]])
+      
+      # Store user responses in the reactive values object
+      user_responses$data <- as.list(selected_options)
+      
+      
+      # Prepare the data frame with appropriate column names
+      response_df <- as.data.frame(t(user_responses$data), stringsAsFactors = FALSE)
+      colnames(response_df) <- questions$QuestionCode
+      rownames(response_df) <- NULL
+      response_df[] <- lapply(response_df, as.character) 
+      
+      # Check if sheet exists and has data
+      sheet_exists <- tryCatch({
+        sheet_names(sheet_id)
+        TRUE
+      }, error = function(e) { FALSE })
+      
+      if (!sheet_exists || nrow(read_sheet(sheet_id, sheet = "main")) == 0) {
+        # If sheet doesn't exist or is empty, write with headers
+        sheet_write(response_df, ss = sheet_id, sheet = "main")
+      } else {
+        # If sheet exists and has data, append without headers
+        sheet_append(response_df, ss = sheet_id, sheet = "main")
+      }
+      
 
-  
-  
-  
-  # Render the download button dynamically
-  output$downloadButton <- renderUI({
-    req(clicked_county()) # Make sure a county is selected
-    downloadButton("downloadPdf", "Download Recommendation")
+      
+      filtered_recs <- final_recommendations
+      for (i in 1:nrow(questions)) {
+        question_col <- LETTERS[i]
+        if (!is.na(final_recommendations[[question_col]][1]) && selected_options[i] != "") {
+          filtered_recs <- filter(filtered_recs, !!sym(question_col) == selected_options[i])
+        }
+      }
+      
+      final_rec <- filtered_recs %>% select(FinalRollup) %>% pull()
+      
+      output$finalRecommendation <- renderText({
+        if (length(final_rec) > 0) {
+          return(final_rec[1])
+        } else {
+          return("No specific recommendation found for this combination of choices.")
+        }
+      })
+    }
   })
   
   
-  # Download handler for the PDF
-  output$downloadPdf <- downloadHandler(
-    filename = function() {
-      paste0(clicked_county(), ".pdf")
-    },
-    content = function(file) {
-      pdf_url <-pdf_example
-      download.file(pdf_url, file, mode = "wb") 
-    }
-  )
+  
+  # Action if user hits "refresh" button
+  # Clears selected inputs
+  # Clears recommendation text
+  observeEvent(input$refreshButton, {
+    lapply(1:nrow(questions), function(i) {
+      question_code <- questions$QuestionCode[i]
+      updateSelectInput(session, paste0("question_", question_code), selected = "")
+      output[[paste0("recommendation_", question_code)]] <- renderText({ NULL })
+    })
+  })
   
   
-}#close server
+  
+  # Dynamic display of recommendations based on dropdown questions
+  observeEvent(questions$QuestionCode, {
+    lapply(1:nrow(questions), function(i) {
+      question_code <- questions$QuestionCode[i]
+      
+      # Monitors value of each question dropdown value
+      # Retrieve corresponding recommendation based on question code and option
+      observeEvent(input[[paste0("question_", question_code)]], {
+        selected_option <- input[[paste0("question_", question_code)]]
+        
+        if (selected_option != "") {
+          recommendation <- recommendations %>%
+            filter(QuestionCode == question_code & Option == selected_option) %>%
+            select(RecommendationDisplay) %>%
+            pull()
+          
+          # Update text
+          output[[paste0("recommendation_", question_code)]] <- renderText({ recommendation })
+        } else {
+          output[[paste0("recommendation_", question_code)]] <- renderText({ NULL })
+        }
+      }, ignoreInit = TRUE)
+    })
+  }, once = TRUE)
+}
 
-
-#############################Part 3/3 
-# ShinyApp - runs the app
 shinyApp(ui, server)
-
