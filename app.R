@@ -13,8 +13,8 @@ options(
   # specify auth tokens should be stored in a hidden directory ".secrets"
   gargle_oauth_cache = "C:/Users/djongsomjit/OneDrive - Point Blue/BioStimulantWeb/BioStimulantWebTool/.secrets"
 )
-googledrive::drive_auth() 
-googlesheets4::gs4_auth()
+#googledrive::drive_auth() 
+#googlesheets4::gs4_auth()
 
 sheet_id <- googledrive::drive_get("testsheet")$id
 
