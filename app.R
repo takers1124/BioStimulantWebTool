@@ -20,6 +20,7 @@ lookup_table <- read.csv(paste0(githuburl,"Counties.csv"))
 lookup_table$County <- paste(lookup_table$County, "County", sep = " ")
 
 
+
 # Get California county boundaries for mapping
 counties_sf <- get_urbn_map("counties", sf = TRUE)
 sf::st_crs(counties_sf) <- 2163
