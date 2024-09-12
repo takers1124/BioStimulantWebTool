@@ -13,9 +13,20 @@
 3. www folder containing any images to be displayed
 
 ## How to create the web app
+
+### First create a github repo and clone it to your local drive. 
 ####  Note: There are several ways to set up a github repository. This is one way that this can be done
 1. Add the above components to a github directory
 2. Open RStudio and set up a new project (File -> New Project)
-3. Select Version Control then Git and add your github URL and a project name
-4. Click Create Project
-5. 
+3. Select Version Control then Git and add your github URL and a project name. **Remember that the project name will be part of the URL of the web app you publish.
+4. Select a location on your local drive where the repo will be cloned
+5. Click Create Project. This will clone all the data from your github repo (except those listed in .gitignore file) then it will open your new RStudio Project
+
+### Now test the app.R file then publish it online
+
+1. Open your app.R code file inside this new RStudio project you created above. Make any edits to the github URL it is pointing to.
+2. To test the code file click on the Run App button and this will open a test version of the web app
+3. Create a shinyapps account and configure it using the rsconnect command as described here https://shiny.posit.co/r/articles/share/shinyapps/ **Remember the URL of your shinyapps account will be part of the web app you publish.
+5. In RStudio click on the Publish icon to the right of the Run App button. This will take you through the needed steps and checks to publish your app
+
+
