@@ -1,0 +1,5 @@
+QuestionCode,QuestionTitle,Option1,Option2
+A,Did the burn happen on public land?,Public Land,Private Land
+B,Was the fire a wildfire?,Prescribed Fire,Wildfire
+C,Was there a structure that burned in this fire?,Structure,No Structure
+D,Did this fire take place in (or near) a wooded area? ,Wooded Area,Other Ecosystem
